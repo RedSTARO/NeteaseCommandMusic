@@ -1,4 +1,7 @@
 requests
 configparser
 json
-base64
+time
+webbrowser
+os
+uni-curses
