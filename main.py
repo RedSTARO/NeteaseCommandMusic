@@ -5,7 +5,9 @@ import time
 import webbrowser
 import os
 config = configparser.ConfigParser()
-DEBUG = True
+
+def DEBUG(info):
+    print(f"DEBUG: {info}")
 
 # Read config
 path = "./config/"
@@ -39,11 +41,11 @@ def login():
     # via QR code
     # ask for login unikey
     req = requests.get(server + f"/login/qr/key?timestamp={int(time.time() * 1000)}")
-    if DEBUG:
-        print("reqAdd: " + f"/login/qr/key?timestamp={int(time.time() * 1000)}")
+
+    DEBUG("reqAdd: " + f"/login/qr/key?timestamp={int(time.time() * 1000)}")
     qrCodeKey = json.loads(req.text)["data"]["unikey"]
-    if DEBUG:
-        print("qrCodeKey: " + qrCodeKey)
+
+    DEBUG("qrCodeKey: " + qrCodeKey)
     # generate QR base64
     req = requests.get(server + f"/login/qr/create?key={qrCodeKey}&qrimg=ture&timestamp={int(time.time() * 1000)}")
     qrImg = json.loads(req.text)["data"]["qrimg"]
@@ -86,15 +88,23 @@ def login():
 
 # User playlist
 def getPlaylist():
+    # Get play list info
     req = requests.get(server + f"/user/playlist?cookie={jsonReader('cookie', 'user.json')}&uid={jsonReader('id', 'user.json')}")
     data = json.loads(req.text)["playlist"]
+    # Get songs in playlist
     for listCount in range(0, len(data)):
+        DEBUG(f"Getting list: {data[listCount]['name']}")
         req = requests.get(server + f"/playlist/track/all?cookie={jsonReader('cookie', 'user.json')}&id={data[listCount]['id']}")
         details = json.loads(req.text)
         jsonUpdater(listCount, {"id": f"{data[listCount]['id']}",
                                 "name": f"{data[listCount]['name']}",
                                 "backgroundUrl": f"{data[listCount]['coverImgUrl']}",
-                                "details": details},
+                                "details": {"name": details["songs"][0]["name"],
+                                            "id": details["songs"][0]["id"],
+                                            "singer": details["songs"][0]["ar"],
+                                            "alia": details["songs"][0]["alia"],
+                                            "album": details["songs"][0]["al"]}}, #details["songs"][0]["tns"],
+                                            # TODO: add for cycle here to fix only generate one song detail bug
                     "playList.json")
     print("Get play list finished.")
 
