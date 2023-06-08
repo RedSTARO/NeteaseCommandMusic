@@ -15,15 +15,15 @@ server = config['system']['server']
 
 def jsonUpdater(newKey, newValue, file, mode="w"):
     file = path + file
-    with open(file, "r") as f:
+    with open(file, "r", encoding="utf-8") as f:
         file_content = f.read().strip()
         if len(file_content) == 0:
             existing_data = {}
         else:
             existing_data = json.loads(file_content)
     existing_data[newKey] = newValue
-    with open(file, mode) as f:
-        f.write(json.dumps(existing_data))
+    with open(file, mode, encoding="utf-8") as f:
+        f.write(json.dumps(existing_data, ensure_ascii=False))
         f.write('\n')
 
 
