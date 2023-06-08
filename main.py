@@ -99,14 +99,10 @@ def getPlaylist():
         jsonUpdater(listCount, {"id": f"{data[listCount]['id']}",
                                 "name": f"{data[listCount]['name']}",
                                 "backgroundUrl": f"{data[listCount]['coverImgUrl']}",
-                                "details": {"name": details["songs"][0]["name"],
-                                            "id": details["songs"][0]["id"],
-                                            "singer": details["songs"][0]["ar"],
-                                            "alia": details["songs"][0]["alia"],
-                                            "album": details["songs"][0]["al"]}}, #details["songs"][0]["tns"],
-                                            # TODO: add for cycle here to fix only generate one song detail bug
+                                "details": details},
                     "playList.json")
     print("Get play list finished.")
+
 
 
 if __name__ == "__main__":
