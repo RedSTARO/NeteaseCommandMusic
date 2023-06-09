@@ -143,6 +143,32 @@ class User():
                                     "details": details},
                         "playList.json")
 
+class Song():
+    def getPLayURL(self,level="jymaster"):
+        with open(configPath + "playList.json", 'r', encoding="utf-8") as f:
+            file_content = f.read().strip()
+            data = json.loads(file_content)
+
+
+        DEBUG(len(data["1"]["details"]["details"]))
+        # for i in range(0, len(data)):
+        #     for j in range(1, len(data[str(i)]["details"])):
+        #         DEBUG(j)
+        #         DEBUG(data[str(i)]["details"]["songs"][j]["name"])
+
+
+
+
+
+
+
+
+                # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
+                # req = requests.get(server + f"/song/url/v1?id={data[str(i)]['details']['songs'][j]['id']}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
+                # data = json.loads(req.text)
+                # DEBUG(data)
 
 if __name__ == "__main__":
-    user = User()
+    # user = User()
+    song = Song()
+    song.getPLayURL()
