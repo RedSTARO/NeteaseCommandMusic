@@ -49,14 +49,6 @@ def jsonReader(key, file):
     return data[key]
 
 
-def downloader(URL, file):
-    file = songPath + file
-    response = requests.get(URL, stream=True)
-    with open(file, 'wb') as file:
-        for chunk in response.iter_content(chunk_size=1024):
-            if chunk:
-                file.write(chunk)
-
 class User():
     def __init__(self):
         # Check login status
@@ -125,18 +117,13 @@ class User():
     # User playlist
     def getPlaylist(self):
         # Get play list info
-        req = requests.get(server + f"/user/playlist?cookie={jsonReader('cookie', 'user.json')}&uid={jsonReader('id', 'user.json')}")
+        req = requests.get(server + f"/user/playlist?cookie={jsonReader('cookie', 'user.json')}&uid={jsonReader('id', 'user.json')}&timestamp={int(time.time() * 1000)}")
         data = json.loads(req.text)["playlist"]
         # Get songs in playlist
         for listCount in range(0, len(data)):
             show(f"Getting list: {data[listCount]['name']}", refresh=True)
             req = requests.get(server + f"/playlist/track/all?cookie={jsonReader('cookie', 'user.json')}&id={data[listCount]['id']}")
             details = json.loads(req.text)
-            # TODO: Get play URL
-            # for i in range(0, len(details["songs"][0])):
-                # DEBUG(details["songs"][i]["name"])
-                # DEBUG(i)
-            # DEBUG(details["songs"][0])
             jsonUpdater(listCount, {"id": f"{data[listCount]['id']}",
                                     "name": f"{data[listCount]['name']}",
                                     "backgroundUrl": f"{data[listCount]['coverImgUrl']}",
@@ -150,18 +137,10 @@ class Song():
             data = json.loads(file_content)
 
 
-        DEBUG(len(data["1"]["details"]["details"]))
-        # for i in range(0, len(data)):
-        #     for j in range(1, len(data[str(i)]["details"])):
-        #         DEBUG(j)
-        #         DEBUG(data[str(i)]["details"]["songs"][j]["name"])
-
-
-
-
-
-
-
+        # DEBUG(len(data["1"]["details"]["details"]))
+        for i in range(0, len(data)):
+            for j in range(1, len(data[str(i)]["details"]["songs"])):
+                DEBUG(f'{j}: {data[str(i)]["details"]["songs"][j]["id"]}: {data[str(i)]["details"]["songs"][j]["name"]}')
 
                 # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
                 # req = requests.get(server + f"/song/url/v1?id={data[str(i)]['details']['songs'][j]['id']}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
@@ -169,6 +148,6 @@ class Song():
                 # DEBUG(data)
 
 if __name__ == "__main__":
-    # user = User()
+    user = User()
     song = Song()
     song.getPLayURL()
