@@ -1,9 +1,10 @@
-import requests
 import configparser
 import json
+import os
 import time
 import webbrowser
-import os
+
+import requests
 
 configPath = "./config/"
 
@@ -55,19 +56,6 @@ def downloader(url, pathToFile):
 
 
 class User():
-    def __init__(self):
-        # Check login status
-        if (jsonReader("cookie", "user.json") == "EmptyFile"):
-            show("Not login, plz login now.")
-            if self.getCookie():
-                show("Login finished.")
-        else:
-            show("Login status detected.")
-        show("Reading user info.")
-        self.getUserDetails()
-        show("Updating play list")
-        self.getPlaylist()
-        show("Update play list finished.", sleep=2, refresh=True)
 
     # Login
     def getCookie(self):
