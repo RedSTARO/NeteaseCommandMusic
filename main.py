@@ -6,7 +6,6 @@ import webbrowser
 import os
 
 configPath = "./config/"
-songPath = "./songs/"
 
 config = configparser.ConfigParser()
 config.read(configPath + "config.ini")
@@ -17,7 +16,7 @@ def DEBUG(info):
     print(f"DEBUG: {info}")
 
 
-def show(text, sleep = 0, refresh = False):
+def show(text, sleep=0, refresh=False):
     if refresh:
         print("\033[F\033[K", end="")
     print(text)
@@ -47,6 +46,12 @@ def jsonReader(key, file):
         else:
             data = json.loads(file_content)
     return data[key]
+
+
+def downloader(url, pathToFile):
+    response = requests.get(url)
+    with open(pathToFile, "wb") as file:
+        file.write(response.content)
 
 
 class User():
@@ -117,12 +122,14 @@ class User():
     # User playlist
     def getPlaylist(self):
         # Get play list info
-        req = requests.get(server + f"/user/playlist?cookie={jsonReader('cookie', 'user.json')}&uid={jsonReader('id', 'user.json')}&timestamp={int(time.time() * 1000)}")
+        req = requests.get(
+            server + f"/user/playlist?cookie={jsonReader('cookie', 'user.json')}&uid={jsonReader('id', 'user.json')}&timestamp={int(time.time() * 1000)}")
         data = json.loads(req.text)["playlist"]
         # Get songs in playlist
         for listCount in range(0, len(data)):
             show(f"Getting list: {data[listCount]['name']}", refresh=True)
-            req = requests.get(server + f"/playlist/track/all?cookie={jsonReader('cookie', 'user.json')}&id={data[listCount]['id']}")
+            req = requests.get(
+                server + f"/playlist/track/all?cookie={jsonReader('cookie', 'user.json')}&id={data[listCount]['id']}")
             details = json.loads(req.text)
             jsonUpdater(listCount, {"id": f"{data[listCount]['id']}",
                                     "name": f"{data[listCount]['name']}",
@@ -130,24 +137,33 @@ class User():
                                     "details": details},
                         "playList.json")
 
+
 class Song():
-    def getPLayURL(self,level="jymaster"):
+    def getPLayURLByJson(self):
+        # songsInList used to store songs id like 1,2,3
+        songsInList = ""
         with open(configPath + "playList.json", 'r', encoding="utf-8") as f:
             file_content = f.read().strip()
-            data = json.loads(file_content)
+            fileData = json.loads(file_content)
+        # Search song list
+        for i in range(0, len(fileData)):
+            # Search songs in list
+            for j in range(0, len(fileData[str(i)]["details"]["songs"]) - 1):
+                songsInList = songsInList + str(fileData[str(i)]["details"]["songs"][j]["id"]) + ","
+            with open(f"{configPath}playList/{str(fileData[str(i)]['id'])}.json", "w",
+                      encoding="utf-8") as f:
+                # [:-1] to remove "," at the end
+                f.write(json.dumps(self.getPlayURLByID(songsInList[:-1]), ensure_ascii=False))
+            songsInList = ""
 
+    def getPlayURLByID(self, id, level="jymaster"):
+        # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
+        req = requests.get(server + f"/song/url/v1?id={id}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
+        data = json.loads(req.text)
+        return data
 
-        # DEBUG(len(data["1"]["details"]["details"]))
-        for i in range(0, len(data)):
-            for j in range(1, len(data[str(i)]["details"]["songs"])):
-                DEBUG(f'{j}: {data[str(i)]["details"]["songs"][j]["id"]}: {data[str(i)]["details"]["songs"][j]["name"]}')
-
-                # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
-                # req = requests.get(server + f"/song/url/v1?id={data[str(i)]['details']['songs'][j]['id']}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
-                # data = json.loads(req.text)
-                # DEBUG(data)
 
 if __name__ == "__main__":
-    user = User()
+    # user = User()
     song = Song()
-    song.getPLayURL()
+    song.getPLayURLByJson()
