@@ -83,18 +83,14 @@ class User():
         with open(html_filename, "w") as html_file:
             html_file.write(html_content)
         webbrowser.open(html_filename)
-        show("Plz scan code in browser.")
         # Check if login successful
         while True:
             time.sleep(1)
             req = requests.get(server + f"/login/qr/check?key={qrCodeKey}&timestamp={int(time.time() * 1000)}")
             scanStauts = json.loads(req.text)
-            if scanStauts["code"] == 802:
-                show("Scan successful, click button on your phone.", refresh=True)
-            elif scanStauts["code"] == 803:
+            if scanStauts["code"] == 803:
                 # Write cookie as a mode to clear history
                 jsonUpdater("cookie", scanStauts["cookie"], "user.json", mode="w")
-                show("Login successful.", refresh=True)
                 return True
 
     # User profile
@@ -104,6 +100,7 @@ class User():
         data = json.loads(req.text)
         # DEBUG(data)
         jsonUpdater("id", data["account"]["id"], "user.json")
+        jsonUpdater("name", data["profile"]["nickname"], "user.json")
         jsonUpdater("avatarUrl", data["profile"]["avatarUrl"], "user.json")
         jsonUpdater("backgroundUrl", data["profile"]["backgroundUrl"], "user.json")
 
@@ -124,7 +121,7 @@ class User():
                                     "backgroundUrl": f"{data[listCount]['coverImgUrl']}",
                                     "details": details},
                         "playList.json")
-
+        return len(data)
 
 class Song():
     def getPLayURLByJson(self):

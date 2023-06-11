@@ -1,7 +1,0 @@
-requests
-configparser
-json
-time
-webbrowser
-os
-uni-curses
