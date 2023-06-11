@@ -48,41 +48,38 @@ def show(text, sleep=0, refresh=False, style=Style(color="green")):
     time.sleep(sleep)
 
 
-def startup():
-    # Clear screen
-    console.clear()
-    # Show title
-    show("NeteaseCommandMusic", style=title_style)
-    # Create user
-    user = User()
-    # Check login status
-    if jsonReader("cookie", "user.json") == "EmptyFile":
-        show("Not login, please login now.")
-        if user.getCookie():
-            show("Login finished.")
-    else:
-        show("Login status detected.")
+# Clear screen
+console.clear()
+# Show title
+show("NeteaseCommandMusic", style=title_style)
+# Create user
+user = User()
+# Check login status
+if jsonReader("cookie", "user.json") == "EmptyFile":
+    show("Not login, please login now.")
+    if user.getCookie():
+        show("Login finished.")
+else:
+    show("Login status detected.")
 
-    show("Reading user info.")
-    user.getUserDetails()
+show("Reading user info.")
+user.getUserDetails()
 
-    show("Updating playlist")
-    show("Total list: " + str(user.getPlaylist()), refresh=True)
+show("Updating playlist")
+show("Total list: " + str(user.getPlaylist()), refresh=True)
 
-    show("Update playlist finished.", sleep=1)
+show("Update playlist finished.", sleep=1)
 
-    # Get user info
-    user.getUserDetails()
+# Get user info
+user.getUserDetails()
 
-    # Show user info
-    downloader(jsonReader('avatarUrl', 'user.json'), "./config/user/avatar.jpg")
-    # Get pic theme color
-    rgb = picColor("./config/user/avatar.jpg")
-    show(f"Welcome, {jsonReader('name', 'user.json')} !", style=Style(color=Color.from_rgb(rgb[0], rgb[1], rgb[2])))
-
-
+# Show user info
+downloader(jsonReader('avatarUrl', 'user.json'), "./config/user/avatar.jpg")
+# Get pic theme color
+rgb = picColor("./config/user/avatar.jpg")
+show(f"Welcome, {jsonReader('name', 'user.json')}!", style=Style(color=Color.from_rgb(rgb[0], rgb[1], rgb[2])))
+show("")
 
 
-if __name__ == "__main__":
-    startup()
-    # console.clear()
+# song = Song()
+# song.getMusicByJson()

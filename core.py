@@ -50,9 +50,11 @@ def jsonReader(key, file):
     return data[key]
 
 def downloader(url, pathToFile):
-    command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}"'
-    subprocess.call(command, shell=True)
-
+    command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}" --file-allocation=none '
+    # subprocess.call(command, shell=True)
+    # Disable output info
+    with open(os.devnull, 'w') as devnull:
+        subprocess.run(command, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
 
 class User():
 
@@ -141,7 +143,7 @@ class Song():
                     if len(os.listdir(folderPath)) == 0:
                         data = self.getPlayURLByID(folderName)
                         link = data["data"][0]["url"]
-                        DEBUG(f"downloading: {folderName}{os.path.splitext(link)[1]}")
+                        show("Downloading " +  str(fileData[str(i)]["details"]["songs"][j]["name"]) + f" ({folderName}{os.path.splitext(link)[1]})", refresh=True)
                         downloader(link, f"./songs/{folderName}/{folderName}{os.path.splitext(link)[1]}")
 
 
