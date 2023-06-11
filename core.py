@@ -51,10 +51,10 @@ def jsonReader(key, file):
 
 def downloader(url, pathToFile):
     command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}" --file-allocation=none '
-    # subprocess.call(command, shell=True)
+    subprocess.call(command, shell=True)
     # Disable output info
-    with open(os.devnull, 'w') as devnull:
-        subprocess.run(command, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+    # with open(os.devnull, 'w') as devnull:
+    #     subprocess.run(command, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
 
 class User():
 
@@ -133,19 +133,21 @@ class Song():
         for i in range(0, len(fileData)):
             # Search songs in list
             for j in range(0, len(fileData[str(i)]["details"]["songs"]) - 1):
-                if download == True:
-                    folderName = str(fileData[str(i)]["details"]["songs"][j]["id"])
-                    folderPath = os.path.join("./songs/", folderName)
-                    # Create folder
-                    if (not os.path.exists(folderPath)):
-                        os.makedirs(folderPath)
-                    # if folder is empty
-                    if len(os.listdir(folderPath)) == 0:
-                        data = self.getPlayURLByID(folderName)
-                        link = data["data"][0]["url"]
-                        show("Downloading " +  str(fileData[str(i)]["details"]["songs"][j]["name"]) + f" ({folderName}{os.path.splitext(link)[1]})", refresh=True)
-                        downloader(link, f"./songs/{folderName}/{folderName}{os.path.splitext(link)[1]}")
-
+                try:
+                    if download == True:
+                        folderName = str(fileData[str(i)]["details"]["songs"][j]["id"])
+                        folderPath = os.path.join("./songs/", folderName)
+                        # Create folder
+                        if (not os.path.exists(folderPath)):
+                            os.makedirs(folderPath)
+                        # if folder is empty
+                        if len(os.listdir(folderPath)) == 0:
+                            data = self.getPlayURLByID(folderName)
+                            link = data["data"][0]["url"]
+                            show("Downloading " +  str(fileData[str(i)]["details"]["songs"][j]["name"]) + f" ({folderName}{os.path.splitext(link)[1]})", refresh=True)
+                            downloader(link, f"./songs/{folderName}/{folderName}{os.path.splitext(link)[1]}")
+                except TypeError:
+                    DEBUG(os.path.splitext(link)[1])
 
     def getPlayURLByID(self, id, level="jymaster"):
         # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带

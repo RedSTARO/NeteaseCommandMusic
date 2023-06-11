@@ -17,6 +17,7 @@ console = Console()
 title_style = Style(color="cyan", bold=True)
 info_style = Style(color="green")
 error_style = Style(color="red")
+input_style = Style(color="magenta")
 
 
 def picColor(path):
@@ -81,5 +82,31 @@ show(f"Welcome, {jsonReader('name', 'user.json')}!", style=Style(color=Color.fro
 show("")
 
 
-# song = Song()
-# song.getMusicByJson()
+# Command functions
+class Command:
+    def execute(self):
+        pass
+
+class DownloadAll(Command):
+    def execute(self):
+        song = Song()
+        song.getMusicByJson(download=True)
+# command list
+commands = {
+    "download all": DownloadAll()
+}
+
+# main cycle
+while True:
+    console.print("NeteaseCommandMusic> ", style=input_style, end="")
+    command_input = input().lower()
+
+    if command_input in commands:
+        command = commands[command_input]
+        command.execute()
+    elif command_input == "quit":
+        console.print("Although life is hard, music always waits for you here. Bye~",
+                      style=Style(color=Color.from_rgb(255, 105, 180)))
+        break
+    else:
+        console.print("Command Not Found.")
