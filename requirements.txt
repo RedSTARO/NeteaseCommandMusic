@@ -1,2 +1,4 @@
 requests
 configparser
+rich
+scikit-learn

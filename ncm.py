@@ -10,8 +10,6 @@ from sklearn.cluster import KMeans
 import builtins
 from core import *
 
-
-
 # 创建控制台对象
 console = Console()
 
@@ -42,17 +40,19 @@ def picColor(path):
         r, g, b = color
     return color
 
+
 def show(text, sleep=0, refresh=False, style=Style(color="green")):
     if refresh:
         builtins.print("\033[F\033[K", end="")
     console.print(text, style=style)
     time.sleep(sleep)
 
+
 def startup():
     # Clear screen
     console.clear()
     # Show title
-    show("NeteaseCommandLineMusic", style=title_style)
+    show("NeteaseCommandMusic", style=title_style)
     # Create user
     user = User()
     # Check login status
@@ -79,6 +79,8 @@ def startup():
     # Get pic theme color
     rgb = picColor("./config/user/avatar.jpg")
     show(f"Welcome, {jsonReader('name', 'user.json')} !", style=Style(color=Color.from_rgb(rgb[0], rgb[1], rgb[2])))
+
+
 
 
 if __name__ == "__main__":

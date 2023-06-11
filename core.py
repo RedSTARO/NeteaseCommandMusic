@@ -3,8 +3,9 @@ import json
 import os
 import time
 import webbrowser
-
 import requests
+import threading
+import subprocess
 
 configPath = "./config/"
 
@@ -48,11 +49,9 @@ def jsonReader(key, file):
             data = json.loads(file_content)
     return data[key]
 
-
 def downloader(url, pathToFile):
-    response = requests.get(url)
-    with open(pathToFile, "wb") as file:
-        file.write(response.content)
+    command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}"'
+    subprocess.call(command, shell=True)
 
 
 class User():
@@ -124,9 +123,7 @@ class User():
         return len(data)
 
 class Song():
-    def getPLayURLByJson(self):
-        # songsInList used to store songs id like 1,2,3
-        songsInList = ""
+    def getMusicByJson(self, download=True):
         with open(configPath + "playList.json", 'r', encoding="utf-8") as f:
             file_content = f.read().strip()
             fileData = json.loads(file_content)
@@ -134,12 +131,19 @@ class Song():
         for i in range(0, len(fileData)):
             # Search songs in list
             for j in range(0, len(fileData[str(i)]["details"]["songs"]) - 1):
-                songsInList = songsInList + str(fileData[str(i)]["details"]["songs"][j]["id"]) + ","
-            with open(f"{configPath}playList/{str(fileData[str(i)]['id'])}.json", "w",
-                      encoding="utf-8") as f:
-                # [:-1] to remove "," at the end
-                f.write(json.dumps(self.getPlayURLByID(songsInList[:-1]), ensure_ascii=False))
-            songsInList = ""
+                if download == True:
+                    folderName = str(fileData[str(i)]["details"]["songs"][j]["id"])
+                    folderPath = os.path.join("./songs/", folderName)
+                    # Create folder
+                    if (not os.path.exists(folderPath)):
+                        os.makedirs(folderPath)
+                    # if folder is empty
+                    if len(os.listdir(folderPath)) == 0:
+                        data = self.getPlayURLByID(folderName)
+                        link = data["data"][0]["url"]
+                        DEBUG(f"downloading: {folderName}{os.path.splitext(link)[1]}")
+                        downloader(link, f"./songs/{folderName}/{folderName}{os.path.splitext(link)[1]}")
+
 
     def getPlayURLByID(self, id, level="jymaster"):
         # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
@@ -151,4 +155,4 @@ class Song():
 if __name__ == "__main__":
     # user = User()
     song = Song()
-    song.getPLayURLByJson()
+    song.getMusicByJson()
