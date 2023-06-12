@@ -75,7 +75,7 @@ show("Update playlist finished.", sleep=1)
 user.getUserDetails()
 
 # Show user info
-downloader(jsonReader('avatarUrl', 'user.json'), "./config/user/avatar.jpg")
+downloader(jsonReader('avatarUrl', 'user.json'), "./config/user", "avatar.jpg",override=True)
 # Get pic theme color
 rgb = picColor("./config/user/avatar.jpg")
 show(f"Welcome, {jsonReader('name', 'user.json')}!", style=Style(color=Color.from_rgb(rgb[0], rgb[1], rgb[2])))

@@ -49,12 +49,17 @@ def jsonReader(key, file):
             data = json.loads(file_content)
     return data[key]
 
-def downloader(url, pathToFile):
-    command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}" --file-allocation=none '
-    subprocess.call(command, shell=True)
+def downloader(url, pathToFile, fileName, override=False):
+    try:
+        if override == True:
+            os.remove(pathToFile + "/" + fileName)
+    except:
+        pass
+    command = f'aria2c -x 16 -s 16 -d "{pathToFile}" "{url}" --file-allocation=none -o {fileName}'
+    # subprocess.call(command, shell=True)
     # Disable output info
-    # with open(os.devnull, 'w') as devnull:
-    #     subprocess.run(command, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+    with open(os.devnull, 'w') as devnull:
+        subprocess.run(command, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
 
 class User():
 
@@ -145,9 +150,9 @@ class Song():
                             data = self.getPlayURLByID(folderName)
                             link = data["data"][0]["url"]
                             show("Downloading " +  str(fileData[str(i)]["details"]["songs"][j]["name"]) + f" ({folderName}{os.path.splitext(link)[1]})", refresh=True)
-                            downloader(link, f"./songs/{folderName}/{folderName}{os.path.splitext(link)[1]}")
+                            downloader(link, f"./songs/{folderName}", f"{folderName}{os.path.splitext(link)[1]}")
                 except TypeError:
-                    DEBUG(os.path.splitext(link)[1])
+                    DEBUG(os.path.splitext(link))
 
     def getPlayURLByID(self, id, level="jymaster"):
         # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
