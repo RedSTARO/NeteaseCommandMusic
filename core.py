@@ -118,19 +118,21 @@ class User():
         data = json.loads(req.text)["playlist"]
         # Get songs in playlist
         for listCount in range(0, len(data)):
-            show(f"Getting list: {data[listCount]['name']}", refresh=True)
             req = requests.get(
                 server + f"/playlist/track/all?cookie={jsonReader('cookie', 'user.json')}&id={data[listCount]['id']}")
             details = json.loads(req.text)
+            for songCount in range(0, len(details["songs"])):
+                show(f"Getting song in {data[listCount]['name']}(List Progress: {listCount}/{len(data)} | Song progress: {songCount}/{data[listCount]['trackCount']})", refresh=True)
+                details["songs"][songCount]["data"] = Song().getPlayURLByID(id = details["songs"][songCount]["id"])
             jsonUpdater(listCount, {"id": f"{data[listCount]['id']}",
                                     "name": f"{data[listCount]['name']}",
                                     "backgroundUrl": f"{data[listCount]['coverImgUrl']}",
+                                    "lastUpdateTime": data[listCount]["updateTime"],
                                     "details": details},
                         "playList.json")
         return len(data)
-
 class Song():
-    def getMusicByJson(self, download=True):
+    def getAllPlayURL(self, download=False):
         with open(configPath + "playList.json", 'r', encoding="utf-8") as f:
             file_content = f.read().strip()
             fileData = json.loads(file_content)
@@ -154,14 +156,15 @@ class Song():
                 except TypeError:
                     DEBUG(os.path.splitext(link))
 
+
+
     def getPlayURLByID(self, id, level="jymaster"):
         # standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 鲸云臻音, jymaster => 鲸云母带
-        req = requests.get(server + f"/song/url/v1?id={id}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
+        req = requests.get(server + f"/song/url/v1?id={str(id)}&level={level}&cookie={jsonReader('cookie', 'user.json')}")
         data = json.loads(req.text)
         return data
 
 
-if __name__ == "__main__":
-    # user = User()
-    song = Song()
-    song.getMusicByJson()
+# if __name__ == "__main__":
+#     user = User()
+#     user.getPlaylist()

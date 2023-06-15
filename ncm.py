@@ -48,7 +48,7 @@ def show(text, sleep=0, refresh=False, style=Style(color="green")):
     console.print(text, style=style)
     time.sleep(sleep)
 
-
+# Initial part
 # Clear screen
 console.clear()
 # Show title
@@ -66,34 +66,30 @@ else:
 show("Reading user info.")
 user.getUserDetails()
 
-show("Updating playlist")
-show("Total list: " + str(user.getPlaylist()), refresh=True)
-
-show("Update playlist finished.", sleep=1)
-
 # Get user info
 user.getUserDetails()
 
+show("Updating playlist")
+show("")
+user.getPlaylist()
+
+show("Update playlist finished.", sleep=1, refresh=True)
+
+
 # Show user info
-downloader(jsonReader('avatarUrl', 'user.json'), "./config/user", "avatar.jpg",override=True)
+downloader(jsonReader('avatarUrl', 'user.json'), "./config/user", "avatar.jpg", override=True)
 # Get pic theme color
 rgb = picColor("./config/user/avatar.jpg")
 show(f"Welcome, {jsonReader('name', 'user.json')}!", style=Style(color=Color.from_rgb(rgb[0], rgb[1], rgb[2])))
-show("")
 
 
-# Command functions
-class Command:
-    def execute(self):
-        pass
 
-class DownloadAll(Command):
-    def execute(self):
-        song = Song()
-        song.getMusicByJson(download=True)
+song = Song()
+
+
 # command list
 commands = {
-    "download all": DownloadAll()
+
 }
 
 # main cycle
@@ -104,7 +100,7 @@ while True:
     if command_input in commands:
         command = commands[command_input]
         command.execute()
-    elif command_input == "quit":
+    elif command_input == "quit" or "exit":
         console.print("Although life is hard, music always waits for you here. Bye~",
                       style=Style(color=Color.from_rgb(255, 105, 180)))
         break
